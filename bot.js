@@ -7,10 +7,10 @@ const request = require('request')
 
 var getDirection = function(start, target, rawMap, size, callback) {
     var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(rawMap)
-    // console.log(url)
+
     request(url, function (error, response, body) {
         callback(body.split("\"")[3])
-    })
+    });
 }
 
 console.dir(argv);
@@ -48,30 +48,21 @@ function bot(play, callback) {
     let taverns = board.taverns;
     let customersPositions = board.customers;
 
-    var nextDirection = getDirection(getMyHero(play.game.heroes).pos, burgers[0], play.game.board.tiles, play.game.board.size, function(direction) {
-        console.log(direction);
-        callback(null, dirs[direction])
-    })
+    let allItems = burgers.concat(frenchFries);
+
     let nextCustomer = selectNextCustomer(customers);
 
-    // fullfillOrder(nextCustomer, burgers, frenchFries);
+    var nextItem = findClosestItem(myHero.pos, allItems);
 
-    // console.log(getMyHero(heros));
-
-    console.log(myHero.pos);
-
-    if (nextDirection === 'n') {
-        var currentPosition = myHero.pos;
-        console.log(nextDirection);
-        console.log(map);
-    }
-
-    console.log(nextDirection);
+    getDirection(myHero.pos, nextItem, play.game.board.tiles, play.game.board.size, function(direction) {
+        console.log(direction);
+        callback(null, dirs[direction])
+    });
 }
 
 function getMyHero(heroes) {
-    for(var i=0; i<heroes.length; ++i){
-        if(heroes[i].name == 'Keep the beat'){
+    for (var i=0; i<heroes.length; ++i){
+        if (heroes[i].name == 'Keep the beat'){
             return heroes[i]
         }
     }
@@ -100,10 +91,22 @@ function selectRandomDirection(dirs) {
     return nextDirection;
 }
 
-function fullfillOrder(customer, burger, frenchFries) {
-    console.log(customer);
-    console.log(burger);
-    console.log(frenchFries);
+function findClosestItem(heroPosition, items) {
+    var firstItem = items[0];
+    var currentMin = (firstItem.x - heroPosition.x) * (firstItem.x - heroPosition.x) + (firstItem.y - heroPosition.y) * (firstItem.y - heroPosition.y);
+    var currentIndex = 0;
+
+    for (var i=1; i<items.length; i++) {
+        var currentItem = items[i];
+        var currentDistance = (currentItem.x - heroPosition.x) * (currentItem.x - heroPosition.x) + (currentItem.y - heroPosition.y) * (currentItem.y - heroPosition.y);
+
+        if (currentDistance < currentMin) {
+            currentMin = currentDistance;
+            currentIndex = i;
+        }
+    }
+
+    return items[currentIndex];
 }
 
 module.exports = bot;
