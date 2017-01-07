@@ -2,7 +2,7 @@
 
 const argv = require('minimist')(process.argv.slice(2));
 const openBrowser = require('open');
-const parseBoard = require('./board/board').parseBoard;
+const parseBoard = require('./src/board/board').parseBoard;
 
 console.dir(argv);
 
@@ -46,5 +46,5 @@ function bot(play, callback) {
 module.exports = bot;
 
 if (require.main === module) {
-    require('./client/index').cli(bot);
+    require('./src/client/index').cli(bot);
 }
