@@ -47,17 +47,33 @@ function bot(play, callback) {
     let frenchFries = board.frenchFries;
     let taverns = board.taverns;
     let customersPositions = board.customers;
-
-    let allItems = burgers.concat(frenchFries);
-
     let nextCustomer = selectNextCustomer(customers);
 
-    var nextItem = findClosestItem(myHero.pos, allItems);
+    let remaining = getRemainingFood(myHero, nextCustomer);
 
-    getDirection(myHero.pos, nextItem, play.game.board.tiles, play.game.board.size, function(direction) {
-        console.log(direction);
-        callback(null, dirs[direction])
-    });
+    let neededPotentialItems = [];
+    if(remaining.burgers > 0) {
+        neededPotentialItems = neededPotentialItems.concat(burgers);
+    }
+    if(remaining.frenchFries > 0) {
+        neededPotentialItems = neededPotentialItems.concat(frenchFries);
+    }
+    console.log(neededPotentialItems)
+    if(neededPotentialItems.length == 0){
+        let nextCustomerPosition = findCustomerById(customersPositions, nextCustomer.id);
+
+        getDirection(myHero.pos, nextCustomerPosition, play.game.board.tiles, play.game.board.size, function(direction) {
+            console.log(direction);
+            callback(null, dirs[direction])
+        });
+    } else {
+        var nextItem = findClosestItem(myHero.pos, neededPotentialItems);
+
+        getDirection(myHero.pos, nextItem, play.game.board.tiles, play.game.board.size, function(direction) {
+            console.log(direction);
+            callback(null, dirs[direction])
+        });
+    }
 }
 
 function getMyHero(heroes) {
@@ -74,10 +90,11 @@ function selectNextCustomer(customers) {
 
     for (var i=0; i<customers.length; i++) {
         var currentCustomer = customers[i];
-        var projectedRatio = (currentCustomer.burger) / (currentCustomer.frenchFries + 1);
+        var projectedRatio = (currentCustomer.burger + 1) / (currentCustomer.frenchFries + 1);
 
         if (projectedRatio > burgerToFrenchFriesRatio) {
             nextCustomerIndex = i;
+            burgerToFrenchFriesRatio = projectedRatio
         }
     }
 
@@ -107,6 +124,23 @@ function findClosestItem(heroPosition, items) {
     }
 
     return items[currentIndex];
+}
+
+function getRemainingFood(hero, customer) {
+    let remaining =  {
+        "burgers": customer.burger-hero.burgerCount,
+        "frenchFries": customer.frenchFries-hero.frenchFriesCount
+    }
+    console.log(remaining)
+    return remaining
+}
+
+function findCustomerById(customers, id) {
+    for(var i=0; i<customers.length; ++i){
+        if (customers[i].id == id) {
+            return customers[i];
+        }
+    }
 }
 
 module.exports = bot;
