@@ -32,7 +32,7 @@ var getDirection = function(start, target, rawMap, size, map, callback) {
         }
     }
 
-    var DEFAULT_TIMEOUT = 500;
+    var DEFAULT_TIMEOUT = 10;
     var transformedMap = rawMap.replace('^^', '##');
 
     var transformedUrl = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(transformedMap);
@@ -170,6 +170,7 @@ function bot(play, callback) {
 
         getDirection(myHero.pos, nextCustomerPosition, play.game.board.tiles, play.game.board.size, map, function(direction) {
             console.log(direction);
+            var nextDirection = dirs[direction];
 
             callback(null, nextDirection);
         });
