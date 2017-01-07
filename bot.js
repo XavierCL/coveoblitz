@@ -5,7 +5,7 @@ const openBrowser = require('open');
 const parseBoard = require('./src/board/board').parseBoard;
 const request = require('request')
 
-var getDirection = function(start, target, rawMap, size, callback) {
+var getDirection = function(start, target, rawMap, size, map, callback) {
     var throughUstensilDirection = undefined;
     var avoidUstenilsDirection = undefined;
     var wasCalled = false;
@@ -27,7 +27,7 @@ var getDirection = function(start, target, rawMap, size, callback) {
             } else {
                 console.log('staying');
                 wasCalled = true;
-                callback('STAY');
+                callback(greedyPathFinding(start, target, map));
             }
         }
     }
@@ -73,6 +73,39 @@ var getDirection = function(start, target, rawMap, size, callback) {
             }
         }
     });
+}
+
+function greedyPathFinding(start, target, map) {
+    var direction = 'STAY';
+    var minDistance = 999;
+
+    if (start.x + 1 < map.length && map[start.x + 1][start.y]) {
+        if (getEucDistance({ x: start.x + 1, y: start.y }, target) < minDistance) {
+            direction = 'NORTH';
+        }
+    }
+
+    if (start.x - 1 >= 0 && map[start.x - 1][start.y]) {
+        if (getEucDistance({ x: start.x - 1, y: start.y }, target) < minDistance) {
+            direction = 'SOUTH';
+        }
+    }
+
+    if (start.y + 1 < map.length && map[start.x][start.y + 1]) {
+        if (getEucDistance({ x: start.x, y: start.y + 1 }, target) < minDistance) {
+            direction = 'EAST';
+        }
+    }
+
+    if (start.y - 1 >= 0 && map[start.x][start.y - 1]) {
+        if (getEucDistance({ x: start.x, y: start.y - 1}, target) < minDistance) {
+            direction = 'WEST';
+        }
+    }
+
+    console.log("Greedy: " + direction);
+
+    return direction;
 }
 
 console.dir(argv);
@@ -127,14 +160,14 @@ function bot(play, callback) {
         if(neededPotentialItems.length === 0){
             let nextCustomerPosition = findCustomerById(customersPositions, nextCustomer.id);
 
-            getDirection(myHero.pos, nextCustomerPosition, play.game.board.tiles, play.game.board.size, function(direction) {
+            getDirection(myHero.pos, nextCustomerPosition, play.game.board.tiles, play.game.board.size, map, function(direction) {
                 console.log(direction);
                 callback(null, dirs[direction])
             });
         } else {
             var nextItem = findClosestItem(myHero.pos, neededPotentialItems);
 
-            getDirection(myHero.pos, nextItem, play.game.board.tiles, play.game.board.size, function(direction) {
+            getDirection(myHero.pos, nextItem, play.game.board.tiles, play.game.board.size, map, function(direction) {
                 console.log(direction);
                 callback(null, dirs[direction])
             });
