@@ -92,17 +92,12 @@ function getMyHero(heroes) {
 function selectNextCustomer(customers, customerPositions, myHeroPos) {
     var burgerToFrenchFriesRatio = 0;
     var nextCustomerIndex = 0;
-    var currentDistance = 0;
+    var currentDistance = 999;
 
     for (var i=0; i<customers.length; i++) {
         var currentCustomer = customers[i];
-        var projectedRatio = (currentCustomer.burger + 1) / (currentCustomer.frenchFries + 1);
 
-        if (projectedRatio > burgerToFrenchFriesRatio) {
-            nextCustomerIndex = i;
-            burgerToFrenchFriesRatio = projectedRatio
-            currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos)
-        } else if (projectedRatio === burgerToFrenchFriesRatio && getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos) < currentDistance) {
+        if (getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos) < currentDistance) {
             nextCustomerIndex = i;
             burgerToFrenchFriesRatio = projectedRatio
             currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos)
