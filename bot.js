@@ -33,17 +33,20 @@ function bot(play, callback) {
         isFirstRound = false;
     }
 
-    let board = parseBoard(play.game.board);
+    let customers = play.game.customers;
+    let heros = play.game.heroes;
+
+    let myHero = getMyHero(heros);
+
+    console.log(myHero)
+
+    let board = parseBoard(play.game.board, myHero.id);
 
     let map = board.map;
     let burgers = board.burgers;
     let frenchFries = board.frenchFries;
     let taverns = board.taverns;
-
-    let customers = play.game.customers;
     let customersPositions = board.customers;
-    let heros = play.game.heroes;
-    let myHero = getMyHero(heros);
 
     var nextDirection = getDirection(getMyHero(play.game.heroes).pos, burgers[0], play.game.board.tiles, play.game.board.size, function(direction) {
         console.log(direction);

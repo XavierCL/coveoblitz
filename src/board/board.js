@@ -25,7 +25,7 @@ const {
  *   customers: Array<CustomerPos>
  * }}
  */
-const parseBoard = (board) => {
+const parseBoard = (board, heroId) => {
     let map = [];
     let burgers = [];
     let frenchFries = [];
@@ -45,9 +45,9 @@ const parseBoard = (board) => {
 
         map[x][y] = tile;
 
-        if (isBurger(tile)) {
+        if (isBurger(tile, heroId)) {
             burgers.push({y: y, x: x});
-        } else if (isFrenchFries(tile)) {
+        } else if (isFrenchFries(tile, heroId)) {
             frenchFries.push({y: y, x: x});
         } else if (isSoftDrink(tile)) {
             softDrinks.push({y: y, x: x});

@@ -40,7 +40,7 @@ const isEmpty = (tile) => tile == Tiles.Empty;
 /**
  * @param {string} tile
  */
-const isWall = (tile) => tile == Tiles.Wall;
+const isWall = (tile) => tile == Tiles.Wall || tile[0]=='B' || tile[0]=='F';
 
 /**
  * @param {string} tile
@@ -50,12 +50,12 @@ const isHero = (tile) => tile[0] == '@';
 /**
  * @param {string} tile
  */
-const isBurger = (tile) => tile[0] == 'B';
+const isBurger = (tile, id) => tile[0] == 'B' && tile[1]!=id.toString();
 
 /**
  * @param {string} tile
  */
-const isFrenchFries = (tile) => tile[0] == 'F';
+const isFrenchFries = (tile, id) => tile[0] == 'F' && tile[1]!=id.toString();
 
 /**
  * @param {string} tile
