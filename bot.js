@@ -47,7 +47,7 @@ function bot(play, callback) {
     let frenchFries = board.frenchFries;
     let taverns = board.taverns;
     let customersPositions = board.customers;
-    let nextCustomer = selectNextCustomer(customers);
+    let nextCustomer = selectNextCustomer(customers, customersPositions, myHero);
 
     let remaining = getRemainingFood(myHero, nextCustomer);
 
@@ -84,9 +84,10 @@ function getMyHero(heroes) {
     }
 }
 
-function selectNextCustomer(customers) {
+function selectNextCustomer(customers, customerPositions, myHeroPos) {
     var burgerToFrenchFriesRatio = 0;
     var nextCustomerIndex = 0;
+    var currentDistance = 0;
 
     for (var i=0; i<customers.length; i++) {
         var currentCustomer = customers[i];
@@ -95,6 +96,11 @@ function selectNextCustomer(customers) {
         if (projectedRatio > burgerToFrenchFriesRatio) {
             nextCustomerIndex = i;
             burgerToFrenchFriesRatio = projectedRatio
+            currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos)
+        } else if(projectedRatio === burgerToFrenchFriesRatio && getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos) < currentDistance) {
+            nextCustomerIndex = i;
+            burgerToFrenchFriesRatio = projectedRatio
+            currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos)
         }
     }
 
@@ -110,12 +116,12 @@ function selectRandomDirection(dirs) {
 
 function findClosestItem(heroPosition, items) {
     var firstItem = items[0];
-    var currentMin = (firstItem.x - heroPosition.x) * (firstItem.x - heroPosition.x) + (firstItem.y - heroPosition.y) * (firstItem.y - heroPosition.y);
+    var currentMin = getEucDistance(heroPosition, firstItem)
     var currentIndex = 0;
 
     for (var i=1; i<items.length; i++) {
         var currentItem = items[i];
-        var currentDistance = (currentItem.x - heroPosition.x) * (currentItem.x - heroPosition.x) + (currentItem.y - heroPosition.y) * (currentItem.y - heroPosition.y);
+        var currentDistance = getEucDistance(heroPosition, currentItem);
 
         if (currentDistance < currentMin) {
             currentMin = currentDistance;
@@ -141,6 +147,14 @@ function findCustomerById(customers, id) {
             return customers[i];
         }
     }
+}
+
+function getManDistance(tile1, tile2){
+    return Math.abs(tile1.x-tile2.x) + Math.abs(tile1.y-tile2.y)
+}
+
+function getEucDistance(tile1, tile2){
+    return Math.pow(tile1.x-tile2.x, 2) + Math.pow(tile1.y-tile2.y, 2)
 }
 
 module.exports = bot;
