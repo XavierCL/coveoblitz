@@ -6,7 +6,7 @@ const parseBoard = require('./src/board/board').parseBoard;
 const request = require('request')
 
 var getDirection = function(start, target, rawMap, size, callback) {
-    var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURI(rawMap)
+    var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(rawMap)
     console.log(url)
     request(url, function (error, response, body) {
         console.log(body)
