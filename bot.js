@@ -81,25 +81,25 @@ function greedyPathFinding(start, target, map) {
 
     if (start.x + 1 < map.length && map[start.x + 1][start.y]) {
         if (getEucDistance({ x: start.x + 1, y: start.y }, target) < minDistance) {
-            direction = 'NORTH';
+            direction = 'EAST';
         }
     }
 
     if (start.x - 1 >= 0 && map[start.x - 1][start.y]) {
         if (getEucDistance({ x: start.x - 1, y: start.y }, target) < minDistance) {
-            direction = 'SOUTH';
+            direction = 'WEST';
         }
     }
 
     if (start.y + 1 < map.length && map[start.x][start.y + 1]) {
         if (getEucDistance({ x: start.x, y: start.y + 1 }, target) < minDistance) {
-            direction = 'EAST';
+            direction = 'SOUTH';
         }
     }
 
     if (start.y - 1 >= 0 && map[start.x][start.y - 1]) {
         if (getEucDistance({ x: start.x, y: start.y - 1}, target) < minDistance) {
-            direction = 'WEST';
+            direction = 'NORTH';
         }
     }
 
@@ -138,12 +138,9 @@ function bot(play, callback) {
     let frenchFries = board.frenchFries;
     let taverns = board.taverns;
 
-    console.log(isCloseToHealing(map, myHero.pos))
-    console.log(myHero.life)
-
     let customersPositions = board.customers;
 
-    let nextCustomer = selectNextCustomer(customers, customersPositions, myHero);
+    let nextCustomer = findClosestCustomer(customers, customersPositions, myHero.pos);
     let remaining = getRemainingFood(myHero, nextCustomer);
 
     let neededPotentialItems = [];
@@ -153,6 +150,9 @@ function bot(play, callback) {
     if (remaining.frenchFries > 0) {
         neededPotentialItems = neededPotentialItems.concat(frenchFries);
     }
+
+    console.log(myHero.pos);
+
     if(neededPotentialItems.length === 0){
         let nextCustomerPosition = findCustomerById(customersPositions, nextCustomer.id);
 
@@ -178,22 +178,21 @@ function getMyHero(heroes) {
     }
 }
 
-function selectNextCustomer(customers, customerPositions, myHeroPos) {
-    var burgerToFrenchFriesRatio = 0;
-    var nextCustomerIndex = 0;
-    var currentDistance = 999;
+function findClosestCustomer(customers, customerPositions, myHeroPos) {
+    var selectedCustomer = customers[0];
+    var selectedDistance = getEucDistance(findCustomerById(customerPositions, selectedCustomer.id), myHeroPos);
 
-    for (var i=0; i<customers.length; i++) {
+    for (var i=1; i<customers.length; i++) {
         var currentCustomer = customers[i];
 
-        if (getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos) < currentDistance) {
-            nextCustomerIndex = i;
-            burgerToFrenchFriesRatio = projectedRatio
-            currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos)
+        var currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos);
+        if (currentCustomer < selectedDistance) {
+            selectedCustomer = currentCustomer;
+            selectedDistance = currentDistance;
         }
     }
 
-    return customers[nextCustomerIndex];
+    return selectedCustomer;
 }
 
 function selectRandomDirection(dirs) {
@@ -242,7 +241,7 @@ function getManDistance(tile1, tile2){
 }
 
 function getEucDistance(tile1, tile2){
-    return Math.pow(tile1.x-tile2.x, 2) + Math.pow(tile1.y-tile2.y, 2)
+    return Math.sqrt(Math.pow(tile1.x - tile2.x, 2) + Math.pow(tile1.y - tile2.y, 2));
 }
 
 function isCloseToHealing(map, pos){
