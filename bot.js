@@ -6,17 +6,54 @@ const parseBoard = require('./src/board/board').parseBoard;
 const request = require('request')
 
 var getDirection = function(start, target, rawMap, size, callback) {
-    var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(rawMap);
+    var DEFAULT_TIMEOUT = 500;
+    var transformedMap = rawMap.replace('^^', '##');
+    var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(transformedMap);
 
-    request.get(url, { timeout: 500 }, function (error, response, body) {
+    request.get(url, { timeout: 300 }, function (error, response, body) {
         if (error) {
-            console.log("pathfinding error, falling back to random");
-            callback(selectRandomDirection(['stay', 'n', 's', 'e', 'w']));
+            console.log(error);
+            var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(rawMap);
+
+            request.get(url, { timeout: DEFAULT_TIMEOUT }, function (error, response, body) {
+                if (error) {
+                    console.log("pathfinding error, falling back to random");
+
+                    callback(selectRandomDirection(['STAY', 'NORTH', 'SOUTH', 'EAST', 'WEST']));
+                } else {
+                    var bodyContent = JSON.parse(body);
+                    var nextDirection = bodyContent['direction'];
+
+                    console.log('getting throught utensils');
+                    callback(nextDirection);
+                }
+            });
         } else {
             var bodyContent = JSON.parse(body);
-            var nextDirection = bodyContent['direction'];
 
-            callback(nextDirection);
+            if (bodyContent['type']) {
+                var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(rawMap);
+
+                request.get(url, { timeout: DEFAULT_TIMEOUT }, function (error, response, body) {
+                    if (error) {
+                        console.log("pathfinding error, falling back to random");
+
+                        callback(selectRandomDirection(['STAY', 'NORTH', 'SOUTH', 'EAST', 'WEST']));
+                    } else {
+                        var bodyContent = JSON.parse(body);
+                        var nextDirection = bodyContent['direction'];
+
+                        console.log("getting throught utensils");
+                        callback(nextDirection);
+                    }
+                });
+            } else {
+                var nextDirection = bodyContent['direction'];
+
+                console.log('avoiding utensils');
+
+                callback(nextDirection);
+            }
         }
     });
 }
@@ -137,7 +174,6 @@ function getRemainingFood(hero, customer) {
         "burgers": customer.burger - hero.burgerCount,
         "frenchFries": customer.frenchFries - hero.frenchFriesCount
     };
-    console.log(remainingItemsCount);
     return remainingItemsCount;
 }
 
