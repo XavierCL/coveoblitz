@@ -9,14 +9,14 @@ var getDirection = function(start, target, rawMap, size, callback) {
     var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(rawMap)
     console.log(url)
     request(url, function (error, response, body) {
-        console.log(body)
-        callback(body.direction)
+        callback(body.split("\"")[3])
     })
 }
 
 console.dir(argv);
 
-const dirs = ['stay', 'n', 's', 'e', 'w'];
+//const dirs = ['stay', 'n', 's', 'e', 'w'];
+const dirs = {'STAY': 'stay', 'NORTH':'n', 'SOUTH':'s', 'EAST':'e', 'WEST':'w'}
 
 let isFirstRound = true;
 
@@ -47,7 +47,7 @@ function bot(play, callback) {
 
     var nextDirection = getDirection(getMyHero(play.game.heroes).pos, burgers[0], play.game.board.tiles, play.game.board.size, function(direction) {
         console.log(direction);
-        callback(null, direction)
+        callback(null, dirs[direction])
     })
 }
 
