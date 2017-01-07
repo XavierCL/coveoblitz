@@ -1,11 +1,7 @@
 var request = require('request');
 
-function PathFindingService(url) {
-    this.url = url;
-}
+var pathfinder = {}
 
-PathFindingService.prototype.getDirection = function() {
 
-}
 
-module.export = PathFindingService;
+module.export = pathfinder;

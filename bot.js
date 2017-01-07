@@ -3,6 +3,16 @@
 const argv = require('minimist')(process.argv.slice(2));
 const openBrowser = require('open');
 const parseBoard = require('./src/board/board').parseBoard;
+const request = require('request')
+
+var getDirection = function(start, target, rawMap, size, callback) {
+    var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURI(rawMap)
+    console.log(url)
+    request(url, function (error, response, body) {
+        console.log(body)
+        callback(body.direction)
+    })
+}
 
 console.dir(argv);
 
@@ -33,10 +43,20 @@ function bot(play, callback) {
     let taverns = board.taverns;
     let customers = board.customers;
 
-    var nextDirection = selectRandomDirection(dirs);
-    console.log(nextDirection);
+    console.log(play.game)
 
-    callback(null, nextDirection);
+    var nextDirection = getDirection(getMyHero(play.game.heroes).pos, burgers[0], play.game.board.tiles, play.game.board.size, function(direction) {
+        console.log(direction);
+        callback(null, direction)
+    })
+}
+
+function getMyHero(heroes) {
+    for(var i=0; i<heroes.length; ++i){
+        if(heroes[i].name == 'Keep the beat'){
+            return heroes[i]
+        }
+    }
 }
 
 function selectRandomDirection(dirs) {
