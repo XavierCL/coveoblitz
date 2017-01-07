@@ -33,14 +33,17 @@ function bot(play, callback) {
     let taverns = board.taverns;
     let customers = board.customers;
 
-    // Choosing a random direction
+    var nextDirection = selectRandomDirection(dirs);
+    console.log(nextDirection);
+
+    callback(null, nextDirection);
+}
+
+function selectRandomDirection(dirs) {
     let i = Math.floor(Math.random() * 5);
-    let dir = dirs[i];
+    let nextDirection = dirs[i];
 
-    console.log(dir);
-
-    // Call the callback with the direction you choosed
-    callback(null, dir);
+    return nextDirection;
 }
 
 module.exports = bot;
