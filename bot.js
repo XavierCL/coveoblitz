@@ -6,10 +6,18 @@ const parseBoard = require('./src/board/board').parseBoard;
 const request = require('request')
 
 var getDirection = function(start, target, rawMap, size, callback) {
-    var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(rawMap)
+    var url = 'http://game.blitz.codes:8081/pathfinding/direction?size='+size+'&start=('+start.x+','+start.y+')&target=('+target.x+','+target.y+')&map='+encodeURIComponent(rawMap);
 
-    request(url, function (error, response, body) {
-        callback(body.split("\"")[3])
+    request.get(url, { timeout: 500 }, function (error, response, body) {
+        if (error) {
+            console.log("pathfinding error, falling back to random");
+            callback(selectRandomDirection(['stay', 'n', 's', 'e', 'w']));
+        } else {
+            var bodyContent = JSON.parse(body);
+            var nextDirection = bodyContent['direction'];
+
+            callback(nextDirection);
+        }
     });
 }
 
