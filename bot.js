@@ -37,29 +37,26 @@ function bot(play, callback) {
     let heros = play.game.heroes;
 
     let myHero = getMyHero(heros);
-
-    console.log(myHero)
-
     let board = parseBoard(play.game.board, myHero.id);
 
     let map = board.map;
     let burgers = board.burgers;
     let frenchFries = board.frenchFries;
     let taverns = board.taverns;
-    let customersPositions = board.customers;
-    let nextCustomer = selectNextCustomer(customers, customersPositions, myHero);
 
+    let customersPositions = board.customers;
+
+    let nextCustomer = selectNextCustomer(customers, customersPositions, myHero);
     let remaining = getRemainingFood(myHero, nextCustomer);
 
     let neededPotentialItems = [];
-    if(remaining.burgers > 0) {
+    if (remaining.burgers > 0) {
         neededPotentialItems = neededPotentialItems.concat(burgers);
     }
-    if(remaining.frenchFries > 0) {
+    if (remaining.frenchFries > 0) {
         neededPotentialItems = neededPotentialItems.concat(frenchFries);
     }
-    console.log(neededPotentialItems)
-    if(neededPotentialItems.length == 0){
+    if(neededPotentialItems.length === 0){
         let nextCustomerPosition = findCustomerById(customersPositions, nextCustomer.id);
 
         getDirection(myHero.pos, nextCustomerPosition, play.game.board.tiles, play.game.board.size, function(direction) {
@@ -97,7 +94,7 @@ function selectNextCustomer(customers, customerPositions, myHeroPos) {
             nextCustomerIndex = i;
             burgerToFrenchFriesRatio = projectedRatio
             currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos)
-        } else if(projectedRatio === burgerToFrenchFriesRatio && getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos) < currentDistance) {
+        } else if (projectedRatio === burgerToFrenchFriesRatio && getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos) < currentDistance) {
             nextCustomerIndex = i;
             burgerToFrenchFriesRatio = projectedRatio
             currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos)
@@ -133,12 +130,12 @@ function findClosestItem(heroPosition, items) {
 }
 
 function getRemainingFood(hero, customer) {
-    let remaining =  {
-        "burgers": customer.burger-hero.burgerCount,
-        "frenchFries": customer.frenchFries-hero.frenchFriesCount
-    }
-    console.log(remaining)
-    return remaining
+    let remainingItemsCount =  {
+        "burgers": customer.burger - hero.burgerCount,
+        "frenchFries": customer.frenchFries - hero.frenchFriesCount
+    };
+    console.log(remainingItemsCount);
+    return remainingItemsCount;
 }
 
 function findCustomerById(customers, id) {
