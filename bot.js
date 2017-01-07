@@ -79,30 +79,44 @@ function greedyPathFinding(start, target, map) {
     var direction = 'STAY';
     var minDistance = 999;
 
-    if (start.x + 1 < map.length && map[start.x + 1][start.y]) {
-        if (getEucDistance({ x: start.x + 1, y: start.y }, target) < minDistance) {
-            direction = 'EAST';
-        }
-    }
+    console.log(start);
+    console.log(target);
 
-    if (start.x - 1 >= 0 && map[start.x - 1][start.y]) {
-        if (getEucDistance({ x: start.x - 1, y: start.y }, target) < minDistance) {
-            direction = 'WEST';
-        }
-    }
+    if (start.x + 1 < map.length && (map[start.x + 1][start.y] === '  ' || map[start.x + 1][start.y] === '^^' || tileEqual({ x: start.x + 1, y: start.y }, target))) {
+        var northDistance = getEucDistance({ x: start.x + 1, y: start.y }, target);
 
-    if (start.y + 1 < map.length && map[start.x][start.y + 1]) {
-        if (getEucDistance({ x: start.x, y: start.y + 1 }, target) < minDistance) {
+        if (northDistance < minDistance) {
             direction = 'SOUTH';
+            minDistance = northDistance;
         }
     }
 
-    if (start.y - 1 >= 0 && map[start.x][start.y - 1]) {
-        if (getEucDistance({ x: start.x, y: start.y - 1}, target) < minDistance) {
+    if (start.x - 1 >= 0 && (map[start.x - 1][start.y] === '  ' || map[start.x - 1][start.y] === '^^' || tileEqual({ x: start.x - 1, y: start.y }, target))) {
+        var southDistance = getEucDistance({ x: start.x - 1, y: start.y }, target);
+
+        if (southDistance < minDistance) {
             direction = 'NORTH';
+            minDistance = southDistance;
         }
     }
 
+    if (start.y + 1 < map.length && (map[start.x][start.y + 1] === '  ' || map[start.x][start.y + 1] === '^^' || tileEqual({ x: start.x, y: start.y + 1}, target))) {
+        var eastDistance = getEucDistance({ x: start.x, y: start.y + 1 }, target);
+        if (eastDistance < minDistance) {
+            direction = 'EAST';
+            minDistance = eastDistance;
+        }
+    }
+
+    if (start.y - 1 >= 0 && (map[start.x][start.y - 1] === '  ' ||  map[start.x][start.y - 1] === '^^' || tileEqual({ x: start.x, y: start.y - 1 }, target))) {
+        var westDistance = getEucDistance({ x: start.x, y: start.y - 1}, target);
+        if (westDistance < minDistance) {
+            direction = 'WEST';
+            minDistance = westDistance;
+        }
+    }
+
+    console.log("Greedy: " + minDistance);
     console.log("Greedy: " + direction);
 
     return direction;
@@ -246,7 +260,8 @@ function getManDistance(tile1, tile2){
 }
 
 function getEucDistance(tile1, tile2){
-    return Math.sqrt(Math.pow(tile1.x - tile2.x, 2) + Math.pow(tile1.y - tile2.y, 2));
+    var result = Math.sqrt(Math.pow(tile1.x - tile2.x, 2) + Math.pow(tile1.y - tile2.y, 2));
+    return result;
 }
 
 function isCloseToHealing(map, pos){
@@ -274,6 +289,10 @@ function getCloseHealDirection(map, pos){
         return 'w';
     }
     return 'stay'
+}
+
+function tileEqual(tile1, tile2) {
+    return tile1.x === tile2.x && tile1.y === tile2.y;
 }
 
 module.exports = bot;
