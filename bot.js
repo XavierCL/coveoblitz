@@ -140,33 +140,37 @@ function bot(play, callback) {
 
     let customersPositions = board.customers;
 
-    let nextCustomer = findClosestCustomer(customers, customersPositions, myHero.pos);
-    let remaining = getRemainingFood(myHero, nextCustomer);
-
-    let neededPotentialItems = [];
-    if (remaining.burgers > 0) {
-        neededPotentialItems = neededPotentialItems.concat(burgers);
-    }
-    if (remaining.frenchFries > 0) {
-        neededPotentialItems = neededPotentialItems.concat(frenchFries);
-    }
-
-    console.log(myHero.pos);
-
-    if(neededPotentialItems.length === 0){
-        let nextCustomerPosition = findCustomerById(customersPositions, nextCustomer.id);
-
-        getDirection(myHero.pos, nextCustomerPosition, play.game.board.tiles, play.game.board.size, map, function(direction) {
-            console.log(direction);
-            callback(null, dirs[direction])
-        });
+    if(isCloseToHealing(map, myHero.pos) && myHero.life < 50 && myHero.calories >= 30) {
+        callback(null, getCloseHealDirection(map, myHero.pos))
     } else {
-        var nextItem = findClosestItem(myHero.pos, neededPotentialItems);
+        let nextCustomer = findClosestCustomer(customers, customersPositions, myHero.pos);
+        let remaining = getRemainingFood(myHero, nextCustomer);
 
-        getDirection(myHero.pos, nextItem, play.game.board.tiles, play.game.board.size, map, function(direction) {
-            console.log(direction);
-            callback(null, dirs[direction])
-        });
+        let neededPotentialItems = [];
+        if (remaining.burgers > 0) {
+            neededPotentialItems = neededPotentialItems.concat(burgers);
+        }
+        if (remaining.frenchFries > 0) {
+            neededPotentialItems = neededPotentialItems.concat(frenchFries);
+        }
+
+        console.log(myHero.pos);
+
+        if(neededPotentialItems.length === 0){
+            let nextCustomerPosition = findCustomerById(customersPositions, nextCustomer.id);
+
+            getDirection(myHero.pos, nextCustomerPosition, play.game.board.tiles, play.game.board.size, map, function(direction) {
+                console.log(direction);
+                callback(null, dirs[direction])
+            });
+        } else {
+            var nextItem = findClosestItem(myHero.pos, neededPotentialItems);
+
+            getDirection(myHero.pos, nextItem, play.game.board.tiles, play.game.board.size, map, function(direction) {
+                console.log(direction);
+                callback(null, dirs[direction])
+            });
+        }
     }
 }
 
@@ -246,6 +250,7 @@ function getEucDistance(tile1, tile2){
 }
 
 function isCloseToHealing(map, pos){
+
     if(pos.x+1 < map.length && map[pos.x+1][pos.y] === "[]"){
         return true;
     } else if(pos.x-1 >= 0 && map[pos.x-1][pos.y] === "[]"){
