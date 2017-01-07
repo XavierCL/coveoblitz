@@ -186,12 +186,13 @@ function findClosestCustomer(customers, customerPositions, myHeroPos) {
         var currentCustomer = customers[i];
 
         var currentDistance = getEucDistance(findCustomerById(customerPositions, currentCustomer.id), myHeroPos);
-        if (currentCustomer < selectedDistance) {
+        console.log("currentDistance:" + currentDistance, "_selectedDistance:" + selectedDistance)
+        if (currentDistance < selectedDistance) {
             selectedCustomer = currentCustomer;
             selectedDistance = currentDistance;
         }
     }
-
+    console.log(selectedCustomer)
     return selectedCustomer;
 }
 
